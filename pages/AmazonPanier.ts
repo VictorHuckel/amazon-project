@@ -15,7 +15,7 @@ class AmazonPanier {
        
         await this.page.click(this.cartIcon); // Cliquer sur l'icône du panier pour accéder au panier
     }
-    
+
     async removeProductFromCart() {
         await this.page.waitForSelector('input.a-color-link[data-action="delete"]', { state: 'visible' }); // Attendre que le bouton soit visible
         await this.page.click('input.a-color-link[data-action="delete"]', { force: true }); // Cliquer sur le bouton de suppression
@@ -27,11 +27,17 @@ class AmazonPanier {
     }
 
     async isCartEmpty() {
-        // Vérifier que le message "Votre panier Amazon est vide." s'affiche
         const emptyMessage = 'Votre panier Amazon est vide.';
-        await this.page.waitForSelector(this.emptyCartMessageSelector);
-        const messageText = await this.page.textContent(this.emptyCartMessageSelector);
-        return messageText?.trim() === emptyMessage;
+        try {
+            await this.page.waitForSelector(this.emptyCartMessageSelector, { timeout: 5000 }); // Set a timeout for testing
+            const messageText = await this.page.textContent(this.emptyCartMessageSelector);
+            return messageText?.trim() === emptyMessage;
+        } catch (error) {
+            console.error('Error checking if cart is empty:', error);
+            const bodyHTML = await this.page.content(); // Get the full HTML for debugging
+            console.log('Current page HTML:', bodyHTML); // Log the HTML content
+            throw error; // Rethrow the error after logging
+        }
     }
 }
 

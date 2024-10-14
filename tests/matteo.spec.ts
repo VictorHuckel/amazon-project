@@ -77,7 +77,7 @@ test('Rechercher un produit par catégorie sur Amazon', async ({ page }) => {
 
 test('Mettre un produit dans le panier sur Amazon avec gestion des cookies', async ({ page }) => {
   // Given: Je suis sur la page d'un produit
-  await page.goto('https://www.amazon.fr/dp/B08CFSZLQ4'); // Remplace par l'URL d'un produit spécifique
+  await page.goto('https://www.amazon.fr/SKYJO-Magilano-divertir-amusantes-famille/dp/B06XZ9K244/ref=zg_bs_c_boost_d_sccl_1/259-8320578-2294812?pd_rd_w=7ZLt4&content-id=amzn1.sym.dd85b726-57e2-4c6c-b501-f81d1824a55a&pf_rd_p=dd85b726-57e2-4c6c-b501-f81d1824a55a&pf_rd_r=D61ZNEZ2F29N6QJFR3W9&pd_rd_wg=VLmgZ&pd_rd_r=f30a0512-76e7-4b82-ae5b-55498100d3d9&pd_rd_i=B06XZ9K244&th=1'); // Remplace par l'URL d'un produit spécifique
 
   // Vérifie si la demande d'activation des cookies apparaît, et la gère
   const acceptCookiesPopup = await page.$('h4.a-alert-heading');
@@ -110,7 +110,7 @@ test('Supprimer un produit du panier sur Amazon avec gestion des fenêtres modal
   }
 
   // Naviguer vers la page d'un produit et l'ajouter au panier
-  await page.goto('https://www.amazon.fr/dp/B08CFSZLQ4'); // URL d'un produit spécifique
+  await page.goto('https://www.amazon.fr/SKYJO-Magilano-divertir-amusantes-famille/dp/B06XZ9K244/ref=zg_bs_c_boost_d_sccl_1/259-8320578-2294812?pd_rd_w=7ZLt4&content-id=amzn1.sym.dd85b726-57e2-4c6c-b501-f81d1824a55a&pf_rd_p=dd85b726-57e2-4c6c-b501-f81d1824a55a&pf_rd_r=D61ZNEZ2F29N6QJFR3W9&pd_rd_wg=VLmgZ&pd_rd_r=f30a0512-76e7-4b82-ae5b-55498100d3d9&pd_rd_i=B06XZ9K244&th=1'); // URL d'un produit spécifique
   await page.click('#add-to-cart-button'); // Ajouter au panier
   await page.waitForSelector('#nav-cart-count'); // Vérifier que l'icône du panier est mise à jour
 
