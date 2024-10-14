@@ -4,6 +4,7 @@ import AmazonSearchResultsPage from '../pages/AmazonSearchResultsPage';
 import AmazonProductPage from '../pages/AmazonProductPage';
 import AmazonCheckoutPage from '../pages/AmazonCheckoutPage';
 import AmazonPanier from '../pages/AmazonPanier';
+import AmazonCategoryPage from '../pages/AmazonCategoryPage'; // Adjust the path if necessary
 
 test('Passer une commande avec un login pendant le checkout', async ({ page }) => {
     const homePage = new AmazonHomePage(page);
@@ -62,4 +63,28 @@ test('Ajouter un produit au panier et vérifier que le panier est vide', async (
     // Vérifier que le message "Votre panier Amazon est vide." s'affiche
     const isCartEmpty = await panier.isCartEmpty();
     expect(isCartEmpty).toBe(true); // Vérifie que le panier est vide
+});
+
+test('Vérifier les filtres et catégories sur une page de catégorie', async ({ page }) => {
+    const homePage = new AmazonHomePage(page);
+    const categoryPage = new AmazonCategoryPage(page);
+
+    // Go to the Amazon site
+    await page.goto('https://www.amazon.fr/');
+
+    // Accept cookies
+    await homePage.acceptCookies();
+
+    // Navigate to a category page (adjust URL for a real category)
+    await page.goto('https://www.amazon.fr/s?field-keywords=electronics'); // Example URL
+
+    // Use a filter
+    const filterValue = 'Filtre Exemples'; // Replace with a valid filter
+    await categoryPage.useFilter(filterValue);
+
+    // Get filtered results
+    const filteredResults = await categoryPage.getFilteredResults();
+
+    // Verify that the results are updated
+    expect(filteredResults.length).toBeGreaterThan(0); // Check that there are results
 });

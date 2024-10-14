@@ -12,14 +12,15 @@ class AmazonPanier {
     }
 
     async goToCart() {
+       
         await this.page.click(this.cartIcon); // Cliquer sur l'icône du panier pour accéder au panier
     }
-
+    
     async removeProductFromCart() {
-        await this.page.waitForSelector(this.removeButton); // Attendre que le bouton soit visible
-        await this.page.click(this.removeButton, { force: true }); // Cliquer sur le bouton de suppression avec force
+        await this.page.waitForSelector('input.a-color-link[data-action="delete"]', { state: 'visible' }); // Attendre que le bouton soit visible
+        await this.page.click('input.a-color-link[data-action="delete"]', { force: true }); // Cliquer sur le bouton de suppression
     }
-
+    
     async isProductRemoved() {
         // Attendre que le produit soit masqué
         await this.page.waitForSelector('.a-size-medium.a-color-base.sc-product-title', { state: 'hidden' });
