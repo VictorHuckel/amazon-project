@@ -1,0 +1,84 @@
+Feature: Automatisation des tests sur Amazon.fr
+
+  Scenario: Création de compte
+    Given Je suis sur la page d'inscription
+    When Je remplis le formulaire d'inscription avec des informations valides
+    And Je soumets le formulaire
+    Then Mon compte est créé avec succès
+
+  Scenario: Login
+    Given Je suis sur la page de connexion
+    When Je saisis un email valide et un mot de passe valide
+    And Je clique sur "Se connecter"
+    Then Je suis connecté à mon compte
+
+  Scenario: Logout
+    Given Je suis connecté à mon compte
+    When Je clique sur "Se déconnecter"
+    Then Je suis déconnecté du site
+
+  Scenario: Création de compte avec un email existant
+    Given Je suis sur la page d'inscription
+    When Je saisis un email déjà utilisé pour un autre compte
+    And Je soumets le formulaire
+    Then Un message d'erreur m'indique que l'email est déjà pris
+
+  Scenario: Vérification de la page d’accueil
+    Given Je suis sur la page d'accueil d'Amazon.fr
+    Then Le logo, le menu et les sections de la page sont correctement affichés
+
+  Scenario: Rechercher un produit dans le moteur de recherche puis l’acheter
+    Given Je suis sur la page d'accueil
+    When Je saisis le nom d'un produit dans le moteur de recherche
+    And Je clique sur le bouton "Rechercher"
+    Then Je vois les résultats de recherche
+    When Je clique sur un produit
+    And Je l'ajoute au panier
+    Then Le produit est dans mon panier
+
+  Scenario: Rechercher un produit par catégorie
+    Given Je suis sur la page d'accueil
+    When Je navigue vers une catégorie de produits
+    Then Les produits de cette catégorie sont affichés
+
+  Scenario: Mettre un produit dans le panier
+    Given Je suis sur la page d'un produit
+    When Je clique sur "Ajouter au panier"
+    Then Le produit est ajouté dans mon panier
+
+  Scenario: Vérifier les quantités de produit dans le panier
+    Given J'ai un produit dans mon panier
+    When Je vais sur la page du panier
+    Then Je peux modifier la quantité du produit
+
+  Scenario: Passer une commande avec une création de compte pendant le checkout
+    Given Mon panier contient des produits
+    When Je passe au checkout
+    And Je crée un compte pendant le processus
+    Then La commande est passée avec succès
+
+  Scenario: Passer une commande avec un login pendant le checkout
+    Given Mon panier contient des produits
+    When Je passe au checkout
+    And Je me connecte pendant le processus
+    Then La commande est passée avec succès
+
+  Scenario: Supprimer un produit du panier
+    Given Mon panier contient des produits
+    When Je supprime un produit du panier
+    Then Le produit est supprimé avec succès
+
+  Scenario: Vérifier les filtres et catégories sur une page de catégorie
+    Given Je suis sur une page de catégorie de produits
+    When J'utilise les filtres disponibles
+    Then Les résultats sont mis à jour en fonction des filtres sélectionnés
+
+  Scenario: Acheter les "Produits fréquemment achetés ensemble"
+    Given Je suis sur la page d'un produit
+    When Je clique sur "Ajouter les produits fréquemment achetés ensemble"
+    Then Tous les produits sont ajoutés au panier
+
+  Scenario: Vérifier les adresses de livraison
+    Given Je suis dans la section des adresses de livraison de mon compte
+    When Je consulte mes adresses sauvegardées
+    Then Les adresses sont correctement affichées
