@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 import AmazonHomePage from '../pages/AmazonHomePage';
 import AmazonSearchResultsPage from '../pages/AmazonSearchResultsPage';
 import AmazonProductPage from '../pages/AmazonProductPage';
@@ -149,4 +149,39 @@ test('Supprimer un produit du panier sur Amazon avec gestion des fenêtres modal
   await page.waitForTimeout(1000); // Attendre un peu pour la mise à jour
   const cartCountAfter = await page.textContent('#nav-cart-count');
   expect(parseInt(cartCountAfter)).toBeLessThan(parseInt(cartCountBefore)); // Le nombre de produits doit diminuer
+});
+
+
+
+
+
+
+
+test('Connexion à un compte Amazon', async ({ pageWithCookiesAccepted }) => {
+  // Naviguer vers la page de connexion
+  await pageWithCookiesAccepted.goto('https://www.amazon.fr/ap/signin?openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.fr%2F%3Fref_%3Dnav_signin&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.assoc_handle=frflex&openid.mode=checkid_setup&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0');
+
+  // Saisir l'email ou numéro de téléphone
+  await pageWithCookiesAccepted.fill('input[name="email"]', 'matteo.dugue@student.junia.com');
+
+  // Cliquer sur "Continuer"
+  await pageWithCookiesAccepted.click('input#continue');
+
+  // Saisir le mot de passe
+  await pageWithCookiesAccepted.fill('input[name="password"]', 'testtest');
+
+  // Cliquer sur "Connexion"
+  await pageWithCookiesAccepted.click('input#signInSubmit');
+
+  // Attendre que l'utilisateur soit redirigé et vérifier la connexion réussie
+  await pageWithCookiesAccepted.waitForSelector('#nav-link-accountList'); // Sélecteur d'un élément spécifique après connexion
+  const accountText = await pageWithCookiesAccepted.textContent('#nav-link-accountList');
+  
+  // Vérifier que le texte contient une indication que l'utilisateur est connecté (par exemple, "Bonjour, Nom")
+  expect(accountText).toContain('Bonjour,'); // Remplace par le texte attendu après connexion
+
+  // Test supplémentaire : vérifier que le bouton "Déconnexion" est présent
+  await pageWithCookiesAccepted.hover('#nav-link-accountList'); // Survoler le menu de compte
+  await pageWithCookiesAccepted.waitForSelector('a#nav-item-signout'); // Sélecteur du bouton "Déconnexion"
+  expect(await pageWithCookiesAccepted.isVisible('a#nav-item-signout')).toBeTruthy();
 });
