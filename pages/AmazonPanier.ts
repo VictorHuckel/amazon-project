@@ -5,7 +5,7 @@ class AmazonPanier {
     private page: Page;
     private cartIcon = '.nav-cart-icon'; // Sélecteur pour l'icône du panier
     private removeButton = '.sc-action-delete'; // Sélecteur pour le bouton de suppression du produit
-    private cartCountSelector = '#nav-cart-count'; // Sélecteur pour le nombre d'articles dans le panier
+    private emptyCartMessageSelector = 'h2.a-size-extra-large.a-spacing-mini.a-spacing-top-base.a-text-normal'; // Sélecteur pour le message panier vide
 
     constructor(page: Page) {
         this.page = page;
@@ -17,26 +17,20 @@ class AmazonPanier {
 
     async removeProductFromCart() {
         await this.page.waitForSelector(this.removeButton); // Attendre que le bouton soit visible
-        await this.page.click(this.removeButton); // Cliquer sur le bouton de suppression
+        await this.page.click(this.removeButton, { force: true }); // Cliquer sur le bouton de suppression avec force
     }
 
     async isProductRemoved() {
-        // Vérifier que le produit a été retiré avec succès
+        // Attendre que le produit soit masqué
         await this.page.waitForSelector('.a-size-medium.a-color-base.sc-product-title', { state: 'hidden' });
     }
 
-    async getCartCount() {
-        // Obtenir le nombre d'articles dans le panier
-        const countText = await this.page.textContent(this.cartCountSelector);
-        return parseInt(countText) || 0; // Retourner 0 si le texte ne peut pas être converti en nombre
-    }
-
-    async waitForCartCount(expectedCount: number) {
-        // Attendre que le nombre d'articles dans le panier atteigne le nombre attendu
-        await this.page.waitForFunction(
-            (expected) => document.querySelector('#nav-cart-count')?.textContent === expected.toString(),
-            expectedCount
-        );
+    async isCartEmpty() {
+        // Vérifier que le message "Votre panier Amazon est vide." s'affiche
+        const emptyMessage = 'Votre panier Amazon est vide.';
+        await this.page.waitForSelector(this.emptyCartMessageSelector);
+        const messageText = await this.page.textContent(this.emptyCartMessageSelector);
+        return messageText?.trim() === emptyMessage;
     }
 }
 

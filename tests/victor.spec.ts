@@ -32,7 +32,8 @@ test('Passer une commande avec un login pendant le checkout', async ({ page }) =
     await expect(page).toHaveURL(/.*checkout/); // vérifier que l'utilisateur est sur la page de checkout
 });
 
-test('Ajouter un produit au panier et vérifier le nombre d\'articles', async ({ page }) => {
+
+test('Ajouter un produit au panier et vérifier que le panier est vide', async ({ page }) => {
     const homePage = new AmazonHomePage(page);
     const searchResultsPage = new AmazonSearchResultsPage(page);
     const productPage = new AmazonProductPage(page);
@@ -58,6 +59,7 @@ test('Ajouter un produit au panier et vérifier le nombre d\'articles', async ({
     // Vérifier que le produit a été supprimé avec succès
     await panier.isProductRemoved();
 
-    // Vérifier que le panier est vide
-    await expect(page.locator('.a-size-medium.a-color-base.sc-empty-cart-message')).toHaveText('Votre panier est vide.');
+    // Vérifier que le message "Votre panier Amazon est vide." s'affiche
+    const isCartEmpty = await panier.isCartEmpty();
+    expect(isCartEmpty).toBe(true); // Vérifie que le panier est vide
 });
