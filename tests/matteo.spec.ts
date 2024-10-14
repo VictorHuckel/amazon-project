@@ -1,13 +1,18 @@
 import { test, expect } from '@playwright/test';
+import AmazonHomePage from '../pages/AmazonHomePage';
+import AmazonSearchResultsPage from '../pages/AmazonSearchResultsPage';
+import AmazonProductPage from '../pages/AmazonProductPage';
+import AmazonCheckoutPage from '../pages/AmazonCheckoutPage';
 
 test('Rechercher un produit dans le moteur de recherche puis l’acheter sur Amazon', async ({ page }) => {
-  // Given: Je suis sur la page d'accueil d'Amazon
-  await page.goto('https://www.amazon.fr'); 
-    // Acceptation des cookies (si la bannière des cookies apparaît)
-  const acceptCookiesButton = await page.$('input#sp-cc-accept'); // Sélecteur du bouton "Accepter les cookies"
-  if (acceptCookiesButton) {
-    await acceptCookiesButton.click();
-  }
+  const homePage = new AmazonHomePage(page);
+  const searchResultsPage = new AmazonSearchResultsPage(page);
+  const productPage = new AmazonProductPage(page);
+  const checkoutPage = new AmazonCheckoutPage(page);
+  // Aller sur le site Amazon
+  await page.goto('https://www.amazon.fr/');
+  // Accepter les cookies
+  await homePage.acceptCookies();
 
   // When: Je saisis le nom d'un produit dans le moteur de recherche
   await page.fill('input#twotabsearchtextbox', 'ordinateur portable'); // Remplacez par le nom du produit
@@ -35,14 +40,14 @@ test('Rechercher un produit dans le moteur de recherche puis l’acheter sur Ama
 
 
 test('Rechercher un produit par catégorie sur Amazon', async ({ page }) => {
-  // Given: Je suis sur la page d'accueil d'Amazon
-  await page.goto('https://www.amazon.fr'); 
-
-  // Acceptation des cookies (si la bannière des cookies apparaît)
-  const acceptCookiesButton = await page.$('input#sp-cc-accept'); // Sélecteur du bouton "Accepter les cookies"
-  if (acceptCookiesButton) {
-    await acceptCookiesButton.click();
-  }
+  const homePage = new AmazonHomePage(page);
+  const searchResultsPage = new AmazonSearchResultsPage(page);
+  const productPage = new AmazonProductPage(page);
+  const checkoutPage = new AmazonCheckoutPage(page);
+  // Aller sur le site Amazon
+  await page.goto('https://www.amazon.fr/');
+  // Accepter les cookies
+  await homePage.acceptCookies();
 
   // When: Je navigue vers une catégorie de produits
   await page.click('a#nav-hamburger-menu'); // Sélecteur pour ouvrir le menu "Toutes les catégories"
@@ -65,4 +70,61 @@ test('Rechercher un produit par catégorie sur Amazon', async ({ page }) => {
   // Vérification que la liste des produits est affichée
   const categoryTitle = await page.textContent('span[class*="a-size-base a-color-base"]');
   expect(categoryTitle).toContain('Ordinateurs portables'); // Vérifie que le bon titre de catégorie est affiché
+});
+
+
+
+
+test('Mettre un produit dans le panier sur Amazon avec gestion des cookies', async ({ page }) => {
+  // Given: Je suis sur la page d'un produit
+  await page.goto('https://www.amazon.fr/dp/B08CFSZLQ4'); // Remplace par l'URL d'un produit spécifique
+
+  // Vérifie si la demande d'activation des cookies apparaît, et la gère
+  const acceptCookiesPopup = await page.$('h4.a-alert-heading');
+  if (acceptCookiesPopup) {
+    // Attendre que le bouton "Continuer" soit visible et cliquer dessus pour activer les cookies
+    await page.waitForSelector('input[name="accept"]');
+    await page.click('input[name="accept"]');
+  }
+
+  // When: Je clique sur "Ajouter au panier"
+  await page.waitForSelector('#add-to-cart-button'); // Attendre que le bouton soit visible
+  await page.click('#add-to-cart-button'); // Sélecteur du bouton "Ajouter au panier"
+
+  // Then: Le produit est ajouté dans mon panier
+  await page.waitForSelector('#nav-cart-count'); // Attendre que l'icône du panier soit mise à jour
+  const cartCount = await page.textContent('#nav-cart-count'); // Obtenir le nombre d'articles dans le panier
+  expect(parseInt(cartCount)).toBeGreaterThan(0); // Vérifie que le produit a bien été ajouté
+});
+
+
+test('Supprimer un produit du panier sur Amazon', async ({ page }) => {
+  // Given: Mon panier contient des produits
+  await page.goto('https://www.amazon.fr'); 
+
+  // Acceptation des cookies (si la bannière des cookies apparaît)
+  const acceptCookiesButton = await page.$('input#sp-cc-accept'); // Sélecteur du bouton "Accepter les cookies"
+  if (acceptCookiesButton) {
+    await acceptCookiesButton.click();
+  }
+
+  // Naviguer vers la page d'un produit et l'ajouter au panier
+  await page.goto('https://www.amazon.fr/dp/B08CFSZLQ4'); // URL d'un produit spécifique
+  await page.click('#add-to-cart-button'); // Ajouter au panier
+  await page.waitForSelector('#nav-cart-count'); // Vérifier que l'icône du panier est mise à jour
+
+  // Naviguer vers le panier
+  await page.click('a#nav-cart'); // Clic sur l'icône du panier
+
+  // Vérifier qu'il y a bien des produits dans le panier
+  const cartCountBefore = await page.textContent('#nav-cart-count');
+  expect(parseInt(cartCountBefore)).toBeGreaterThan(0); // Le panier ne doit pas être vide
+
+  // When: Je supprime un produit du panier
+  await page.click('input[value="Supprimer"]'); // Sélecteur pour le bouton "Supprimer" du produit
+
+  // Then: Le produit est supprimé avec succès
+  await page.waitForTimeout(1000); // Attendre un peu pour la mise à jour
+  const cartCountAfter = await page.textContent('#nav-cart-count');
+  expect(parseInt(cartCountAfter)).toBeLessThan(parseInt(cartCountBefore)); // Le nombre de produits doit diminuer
 });
