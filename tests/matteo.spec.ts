@@ -98,7 +98,8 @@ test('Mettre un produit dans le panier sur Amazon avec gestion des cookies', asy
 });
 
 
-test('Supprimer un produit du panier sur Amazon', async ({ page }) => {
+
+test('Supprimer un produit du panier sur Amazon avec gestion des fenêtres modales et clic forcé', async ({ page }) => {
   // Given: Mon panier contient des produits
   await page.goto('https://www.amazon.fr'); 
 
@@ -113,8 +114,29 @@ test('Supprimer un produit du panier sur Amazon', async ({ page }) => {
   await page.click('#add-to-cart-button'); // Ajouter au panier
   await page.waitForSelector('#nav-cart-count'); // Vérifier que l'icône du panier est mise à jour
 
-  // Naviguer vers le panier
-  await page.click('a#nav-cart'); // Clic sur l'icône du panier
+  // Gérer toutes les fenêtres modales possibles après l'ajout au panier
+  const modalSelectors = [
+    'input[name="proceedToRetailCheckout"]', // "Continuer sans protection"
+    'input[name="attachSiNoCoverage"]', // "Non merci"
+    'button[data-action="a-popover-close"]' // Bouton pour fermer les popovers
+  ];
+
+  for (const selector of modalSelectors) {
+    const modal = await page.$(selector);
+    if (modal) {
+      await modal.click(); // Fermer la modale si elle est présente
+    }
+  }
+
+  // When: Je navigue vers le panier
+  try {
+    await page.click('a#nav-cart'); // Clic sur l'icône du panier
+  } catch (e) {
+    // Forcer le clic sur le panier si la fenêtre modale bloque encore l'accès
+    await page.evaluate(() => {
+      document.querySelector('a#nav-cart').click();
+    });
+  }
 
   // Vérifier qu'il y a bien des produits dans le panier
   const cartCountBefore = await page.textContent('#nav-cart-count');
