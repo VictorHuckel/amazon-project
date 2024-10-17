@@ -50,3 +50,34 @@ test('Se connecter', async ({ page }) => {
 
 
 });
+
+test('Mettre à jour les adresses de livraison', async ({ page }) => {
+  const homePage = new AmazonHomePage(page);
+
+
+  await page.goto('https://www.amazon.fr/');
+  await homePage.acceptCookies();
+  await homePage.Changeadress('59310');
+
+
+
+
+});
+
+test('Service client', async ({ page }) => {
+  const homePage = new AmazonHomePage(page);
+  const serviceClientOption = page.locator('a.hmenu-item:has-text("Service client")').nth(0);
+
+  await page.goto('https://www.amazon.fr');
+  await homePage.acceptCookies();
+
+  await homePage.MenuButton();
+  await page.waitForSelector('.hmenu-visible');
+
+  await serviceClientOption.click();
+
+  await expect(page).toHaveURL(/.*help\/customer\/display.html/);
+
+
+});
+

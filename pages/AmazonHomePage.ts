@@ -7,6 +7,11 @@ class AmazonHomePage {
     private searchInput = 'input[name="field-keywords"]';
     private searchButton = 'input[type="submit"]';
     private loginButton = '#nav-link-accountList';
+    private adressButton = '#nav-global-location-popover-link';
+    private postalCodeInput = '#GLUXZipUpdateInput'
+    private actualiserButton = 'input.a-button-input[aria-labelledby="GLUXZipUpdate-announce"]';
+    private menuButton = '#nav-hamburger-menu';
+    
 
 
     constructor(page: Page) {
@@ -24,6 +29,17 @@ class AmazonHomePage {
 
     async gologin(){
         await this.page.click(this.loginButton);
+    }
+
+    async Changeadress(postalCode: string){
+        await this.page.click(this.adressButton);
+        await this.page.fill(this.postalCodeInput, postalCode);
+        await this.page.click(this.actualiserButton);
+
+    }
+
+    async MenuButton(){
+        await this.page.click(this.menuButton);
     }
 }
 
