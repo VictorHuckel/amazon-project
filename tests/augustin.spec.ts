@@ -25,7 +25,6 @@ test('Créez un compte', async ({ page }) => {
   await signUpPage.fillSignUpForm('Augustin','augustin.fernandes@student.junia.com','Legroscaca');
 });
 
-
 test('Se connecter', async ({ page }) => {
   const homePage = new AmazonHomePage(page);
   const searchResultsPage = new AmazonSearchResultsPage(page);
@@ -81,3 +80,17 @@ test('Service client', async ({ page }) => {
 
 });
 
+test('Changer la langue du site', async ({ page }) => {
+  const homePage = new AmazonHomePage(page);
+  const langue = page.locator('#icp-nav-flyout');
+
+  await page.goto('https://www.amazon.fr/');
+  await homePage.acceptCookies();
+  await langue.click();
+  await page.waitForSelector('#icp-nav-flyout', { state: 'visible' }); // Remplacez '.some-selector' par le sélecteur approprié
+  await page.getByRole('radio',{name:'English - EN' }).check({force:true});
+  await page.locator('input[type="submit"][aria-labelledby="icp-save-button-announce"]').click();
+  await expect(page).toHaveURL('https://www.amazon.fr/?language=en_GB');
+
+
+});
