@@ -65,8 +65,6 @@ test('Ajouter un produit au panier et vérifier que le panier est vide', async (
     const isCartEmpty = await panier.isCartEmpty();
     expect(isCartEmpty).toBe(true); // Vérifie que le panier est vide
 });
-
-
 test('Vérifier les filtres et catégories sur une page de catégorie', async ({ page }) => {
     const homePage = new AmazonHomePage(page);
     const categoryPage = new AmazonCategoryPage(page);
@@ -90,3 +88,4 @@ test('Vérifier les filtres et catégories sur une page de catégorie', async ({
     // Verify that the results are updated
     expect(filteredResults.length).toBeGreaterThan(0); // Check that there are results
 });
+

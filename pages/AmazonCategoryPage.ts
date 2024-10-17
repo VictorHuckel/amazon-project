@@ -11,8 +11,8 @@ class AmazonCategoryPage {
     }
 
     async useFilter(filterValue: string) {
-        // Click on a given filter
-        await this.page.click(`${this.categoryFilter}[data-value="${filterValue}"]`); // Adjust selector
+        // Replace with the actual filter selector
+        await this.page.click(`.filter-class-name[data-value="${filterValue}"]`); // Adjust according to the actual filter
         await this.page.waitForTimeout(2000); // Wait for results to update
     }
 
@@ -36,6 +36,7 @@ class AmazonCategoryPage {
             })
         , results);
     }
+
 }
 
 export default AmazonCategoryPage;
