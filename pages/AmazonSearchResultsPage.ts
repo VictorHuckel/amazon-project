@@ -12,7 +12,9 @@ class AmazonSearchResultsPage {
     async selectFirstProduct() {
         await this.page.waitForSelector(this.firstResultItem);
         await this.page.click(this.firstResultItem);
+ 
     }
+    
 }
 
 export default AmazonSearchResultsPage;
