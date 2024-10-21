@@ -8,20 +8,9 @@ class AmazonCategoryPage {
     }
 
     async applyFilterByLabel(filterType: string, filterValue: string) {
-        // Chercher le filtre correspondant
-        const filterSelector = `//span[contains(text(), '${filterType}')]/following::span[contains(text(), '${filterValue}')]/ancestor::li//input[@type='checkbox']`;
-
-        // S'assurer que le filtre est visible avant de cliquer
-        const filterElement = await this.page.waitForSelector(filterSelector, { state: 'visible' });
-
-        // Vérifier si l'élément a été trouvé et faire défiler vers lui si nécessaire
-        await filterElement.scrollIntoViewIfNeeded();
-
-        // Cochez la case du filtre
-        await filterElement.check();
-
-        // Attendre que la page se recharge ou que les résultats soient filtrés
-        await this.page.waitForTimeout(5000); // Ajuster selon les temps de chargement
+        await this.page.click(`span[aria-label="${filterType}"]`);
+        await this.page.click(`li[aria-label="${filterValue}"]`);
+        
     }
 
     async applyPriceFilter(minPrice: number, maxPrice: number) {
