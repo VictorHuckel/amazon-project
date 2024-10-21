@@ -11,12 +11,14 @@ class AmazonHomePage {
     private postalCodeInput = '#GLUXZipUpdateInput'
     private actualiserButton = 'input.a-button-input[aria-labelledby="GLUXZipUpdate-announce"]';
     private menuButton = '#nav-hamburger-menu';
+    readonly categoryDropdown: Locator;
     readonly productTitle: Locator;
     readonly addToCartButton: Locator;
     //private cartButton: '#nav-cart';
     readonly searchInput: Locator;
     readonly searchButton: Locator;
     readonly cartButton: Locator;
+    readonly deleteButton: Locator;
     
 
 
@@ -25,13 +27,12 @@ class AmazonHomePage {
         this.searchInput = page.locator('#twotabsearchtextbox'); // Champ de recherche
         this.searchButton = page.locator('input[type="submit"][value="Go"]'); // Bouton de recherche
         this.cartButton = page.locator('#nav-cart'); // Bouton du panier
+        this.categoryDropdown = page.locator('select#searchDropdownBox');
         this.productTitle = page.locator('.s-title-instructions-style'); // Titre du produit dans la page de résultats
-        // Sélecteur par ID (habituellement utilisé)
-        this.addToCartButton = page.locator('#add-to-cart-button');
-        // Sélecteur basé sur un attribut aria-label (accessibilité)
-        this.addToCartButton = page.locator('button[aria-label="Add to Shopping Cart"]');
-        // Sélecteur basé sur un texte (si le texte est en clair dans le bouton)
-        this.addToCartButton = page.locator('button:has-text("Add to Cart")');
+        this.addToCartButton = page.locator('#add-to-cart-button');        // Sélecteur par ID (habituellement utilisé)
+        this.addToCartButton = page.locator('button[aria-label="Add to Shopping Cart"]');        // Sélecteur basé sur un attribut aria-label (accessibilité)
+        this.addToCartButton = page.locator('button:has-text("Add to Cart")');        // Sélecteur basé sur un texte (si le texte est en clair dans le bouton)
+        this.deleteButton = page.locator('.a-declarative .a-button-link'); // Adapté pour le bouton de suppression
    
     }
 
@@ -40,6 +41,11 @@ class AmazonHomePage {
         await this.page.goto('https://www.amazon.com');
     }
 
+    async searchProductByCategory(category, product) {
+        await this.categoryDropdown.selectOption(category);
+        await this.searchInput.fill(product);
+        await this.searchButton.click();
+    }
     async addToCart() {
         // Attendre que la page soit chargée et que le bouton soit visible
         await this.page.waitForLoadState('domcontentloaded');
@@ -49,6 +55,13 @@ class AmazonHomePage {
         await this.addToCartButton.scrollIntoViewIfNeeded(); 
         // Cliquer sur le bouton ajouter au panier
         await this.addToCartButton.click();
+    }
+    async removeProductFromCart() {
+        await this.deleteButton.click();
+        await this.page.waitForTimeout(2000); // Attendre que le modal apparaisse pour la confirmation
+        // Clic forcé si le modal est affiché
+        const confirmDeleteButton = this.page.locator('input[value="Delete"]');
+        await confirmDeleteButton.click();
     }
 
     async clickOnFirstProduct() {

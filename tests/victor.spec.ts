@@ -65,9 +65,13 @@ test('Ajouter un produit au panier et vérifier que le panier est vide', async (
     const isCartEmpty = await panier.isCartEmpty();
     expect(isCartEmpty).toBe(true); // Vérifie que le panier est vide
 });
-test('Vérifier les filtres et catégories sur une page de catégorie', async ({ page }) => {
+
+test('Filtrer les PC portables sur Amazon avec des critères spécifiques', async ({ page }) => {
     const homePage = new AmazonHomePage(page);
-    const categoryPage = new AmazonCategoryPage(page);
+    const searchResultsPage = new AmazonSearchResultsPage(page);
+    const productPage = new AmazonProductPage(page);
+    const panier = new AmazonPanier(page);
+    const categoryPage = new AmazonCategoryPage(page); // Utiliser la page de catégorie pour appliquer les filtres
 
     // Go to the Amazon site
     await page.goto('https://www.amazon.fr/');
@@ -96,12 +100,10 @@ test('acheter les produits fréquemment achetés ensemble', async ({ page }) => 
     
     await page.goto('https://www.amazon.fr');
     await homePage.acceptCookies();
-    await homePage.searchForProduct('souris');
+    await homePage.searchForProduct('clavier');
     await searchResultsPage.selectFirstProduct();
     await page.locator('#similarities-product-bundle-widget-title').scrollIntoViewIfNeeded();
     await page.click('input[name="submit.addToCart"]');
-    await page.click('input[name="proceedToRetailCheckout"]');
-
     
 
 
