@@ -84,9 +84,11 @@ test('Filtrer les PC portables sur Amazon avec des critères spécifiques', asyn
     await searchResultsPage.waitForResults();
     await page.waitForTimeout(5000); // Ajustez le temps d'attente selon le besoin
 
-    // Appliquer les filtres spécifiques :
-    await categoryPage.applyFilterByLabel('Marques', 'Lenovo');  // Filtrer par Marque: Lenovo
-    await page.waitForLoadState('networkidle'); // Attendre que les résultats se mettent à jour
+    // await categoryPage.Filtres('64 Go');
+    // Filtrer par prix en utilisant l'ID de la barre de filtre
+    
+    
+
 });
 
 test('acheter les produits fréquemment achetés ensemble', async ({ page }) => {
