@@ -27,17 +27,19 @@ class AmazonPanier {
     }
 
     async isCartEmpty() {
-        const emptyMessage = 'Votre panier Amazon est vide.';
-        try {
-            await this.page.waitForSelector(this.emptyCartMessageSelector, { timeout: 5000 }); // Set a timeout for testing
-            const messageText = await this.page.textContent(this.emptyCartMessageSelector);
-            return messageText?.trim() === emptyMessage;
-        } catch (error) {
-            console.error('Error checking if cart is empty:', error);
-            const bodyHTML = await this.page.content(); // Get the full HTML for debugging
-            console.log('Current page HTML:', bodyHTML); // Log the HTML content
-            throw error; // Rethrow the error after logging
-        }
+        // Sélecteur du sous-total des articles dans le panier
+        const cartSubtotalSelector = '#sc-subtotal-label-activecart';
+    
+        // Attendre que l'élément du sous-total soit visible
+        await this.page.waitForSelector(cartSubtotalSelector);
+    
+        // Récupérer le texte du sous-total
+        const subtotalText = await this.page.textContent(cartSubtotalSelector);
+    
+        // Vérifier si le sous-total indique "0 articles"
+        const isEmpty = subtotalText?.includes('Sous-total (0 articles)');
+        
+        return isEmpty;
     }
 }
 

@@ -185,3 +185,27 @@ test('Connexion à un compte Amazon', async ({ pageWithCookiesAccepted }) => {
   await pageWithCookiesAccepted.waitForSelector('a#nav-item-signout'); // Sélecteur du bouton "Déconnexion"
   expect(await pageWithCookiesAccepted.isVisible('a#nav-item-signout')).toBeTruthy();
 });
+
+
+
+
+test('Test Amazon Search and Add to Cart', async ({ page }) => {
+  // Créer une instance de la classe AmazonHomePage
+  const amazonHomePage = new AmazonHomePage(page);
+
+  // Naviguer vers Amazon
+  await amazonHomePage.navigate();
+
+  // Rechercher un produit spécifique
+  await amazonHomePage.searchForItem('PlayStation 5');
+
+  // Cliquer sur le premier produit dans la liste des résultats
+  await amazonHomePage.clickOnFirstProduct();
+
+  // Ajouter le produit au panier
+  await amazonHomePage.addToCart();
+
+  // Aller au panier et vérifier que l'URL est correcte
+  await amazonHomePage.goToCart();
+  await expect(page).toHaveURL('https://www.amazon.com/gp/cart/view.html');
+});

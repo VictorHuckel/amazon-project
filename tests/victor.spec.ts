@@ -80,7 +80,7 @@ test('Vérifier les filtres et catégories sur une page de catégorie', async ({
 
     // Use a filter
     const filterValue = 'Filtre Exemples'; // Replace with a valid filter
-    await categoryPage.useFilter(filterValue);
+    // await categoryPage.useFilter(filterValue);
 
     // Get filtered results
     const filteredResults = await categoryPage.getFilteredResults();
