@@ -27,20 +27,22 @@ class AmazonPanier {
     }
 
     async isCartEmpty() {
-        // Sélecteur du sous-total des articles dans le panier
-        const cartSubtotalSelector = '#sc-subtotal-label-activecart';
+        // Sélecteur pour le message qui s'affiche lorsque le panier est vide
+        const emptyCartMessageSelector = 'h2.a-size-extra-large.a-spacing-mini.a-spacing-top-base.a-text-normal';
     
-        // Attendre que l'élément du sous-total soit visible
-        await this.page.waitForSelector(cartSubtotalSelector);
+        // Attendre que l'élément soit visible
+        try {
+            await this.page.waitForSelector(emptyCartMessageSelector, { timeout: 5000 });
+            const messageText = await this.page.textContent(emptyCartMessageSelector);
     
-        // Récupérer le texte du sous-total
-        const subtotalText = await this.page.textContent(cartSubtotalSelector);
-    
-        // Vérifier si le sous-total indique "0 articles"
-        const isEmpty = subtotalText?.includes('Sous-total (0 articles)');
-        
-        return isEmpty;
+            // Vérifier si le texte correspond au message indiquant que le panier est vide
+            return messageText?.trim() === 'Votre panier Amazon est vide.';
+        } catch (e) {
+            // Si le sélecteur n'est pas trouvé, cela signifie que le panier n'est pas vide
+            return false;
+        }
     }
+    
 }
 
 export default AmazonPanier;
