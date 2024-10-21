@@ -19,13 +19,16 @@ class AmazonHomePage {
     readonly searchButton: Locator;
     readonly cartButton: Locator;
     readonly deleteButton: Locator;
+    readonly productInCart: Locator;
     
 
 
     constructor(page: Page) {
         this.page = page;
         this.searchInput = page.locator('#twotabsearchtextbox'); // Champ de recherche
+        this.searchInput = page.locator('input#twotabsearchtextbox');
         this.searchButton = page.locator('input[type="submit"][value="Go"]'); // Bouton de recherche
+        this.searchButton = page.locator('input#nav-search-submit-button');
         this.cartButton = page.locator('#nav-cart'); // Bouton du panier
         this.categoryDropdown = page.locator('select#searchDropdownBox');
         this.productTitle = page.locator('.s-title-instructions-style'); // Titre du produit dans la page de résultats
@@ -33,24 +36,24 @@ class AmazonHomePage {
         this.addToCartButton = page.locator('button[aria-label="Add to Shopping Cart"]');        // Sélecteur basé sur un attribut aria-label (accessibilité)
         this.addToCartButton = page.locator('button:has-text("Add to Cart")');        // Sélecteur basé sur un texte (si le texte est en clair dans le bouton)
         this.deleteButton = page.locator('.a-declarative .a-button-link'); // Adapté pour le bouton de suppression
-   
+        this.productInCart = page.locator('.sc-product-title'); // Sélecteur pour le titre du produit dans le panier
     }
 
     // Méthode pour naviguer vers la page d'accueil d'Amazon
     async navigate() {
-        await this.page.goto('https://www.amazon.com');
+        await this.page.goto('https://www.amazon.fr');
     }
 
     async searchProductByCategory(category, product) {
-        await this.categoryDropdown.selectOption(category);
-        await this.searchInput.fill(product);
-        await this.searchButton.click();
+        await this.categoryDropdown.selectOption(category); // Sélectionner la catégorie
+        await this.searchInput.fill(product); // Remplir le champ de recherche
+        await this.searchButton.click(); // Cliquer sur le bouton de recherche
     }
     async addToCart() {
         // Attendre que la page soit chargée et que le bouton soit visible
-        await this.page.waitForLoadState('domcontentloaded');
+        //await this.page.waitForLoadState('domcontentloaded');
         // Sélectionner un sélecteur alternatif si nécessaire
-        await this.page.waitForSelector('#add-to-cart-button', { state: 'visible', timeout: 10000 });
+        await this.page.waitForSelector('#add-to-cart-button');
         // S'assurer que l'élément est visible à l'écran
         await this.addToCartButton.scrollIntoViewIfNeeded(); 
         // Cliquer sur le bouton ajouter au panier
@@ -111,6 +114,12 @@ class AmazonHomePage {
 
     async MenuButton(){
         await this.page.click(this.menuButton);
+    }
+
+    async isProductInCart(productTitle) {
+        await this.page.waitForSelector('.sc-product-title'); // Attendre que le produit apparaisse dans le panier
+        const titles = await this.productInCart.allTextContents();
+        return titles.some(title => title.includes(productTitle)); // Vérifie si le titre du produit est dans le panier
     }
     
 }

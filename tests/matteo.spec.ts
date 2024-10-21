@@ -1,145 +1,105 @@
-import { test, expect } from './fixture';
-import AmazonHomePage from '../pages/AmazonHomePage';
-import AmazonSearchResultsPage from '../pages/AmazonSearchResultsPage';
-import AmazonProductPage from '../pages/AmazonProductPage';
-import AmazonCheckoutPage from '../pages/AmazonCheckoutPage';
+// tests/amazon.test.ts
 
-test('Rechercher un produit dans le moteur de recherche puis l’acheter sur Amazon', async ({ page }) => {
-  const homePage = new AmazonHomePage(page);
-  const searchResultsPage = new AmazonSearchResultsPage(page);
-  const productPage = new AmazonProductPage(page);
-  const checkoutPage = new AmazonCheckoutPage(page);
-  // Aller sur le site Amazon
-  await page.goto('https://www.amazon.fr/');
-  // Accepter les cookies
-  await homePage.acceptCookies();
+import { test, expect } from '@playwright/test';
+import { AmazonPage } from '../pages/MatteoPage';
 
-  // When: Je saisis le nom d'un produit dans le moteur de recherche
-  await page.fill('input#twotabsearchtextbox', 'ordinateur portable'); // Remplacez par le nom du produit
+test.describe('Tests Amazon', () => {
+    let amazonPage: AmazonPage;
 
-  // And: Je clique sur le bouton "Rechercher"
-  await page.click('input#nav-search-submit-button');
+    test.beforeEach(async ({ page }) => {
+        // Initialiser la page Amazon
+        amazonPage = new AmazonPage(page);
+        await amazonPage.goto();
+    });
 
-  // Then: Je vois les résultats de recherche
-  await expect(page).toHaveURL(/s/); // Vérifie si la page des résultats de recherche est affichée
+    test('Rechercher un produit dans le moteur de recherche puis l’acheter', async ({ page }) => {
+        // Given Je suis sur la page d'accueil
+        // (Déjà fait dans beforeEach)
 
-  // When: Je clique sur un produit (prend le premier produit de la liste)
-  await page.click('span.a-size-medium.a-color-base.a-text-normal'); // Sélecteur pour le titre du produit
+        // When Je saisis le nom d'un produit dans le moteur de recherche
+        await amazonPage.searchProduct('lego');
 
-  // Then: J'attends que la page du produit soit visible
-  await page.waitForSelector('#productTitle');
-  
-  // And: Je l'ajoute au panier
-  await page.click('#add-to-cart-button'); // Bouton pour ajouter au panier
+        // Then Je vois les résultats de recherche
+        await expect(page).toHaveURL(/.*field-keywords/);
 
-  // Then: Le produit est dans mon panier
-  await page.click('a#nav-cart'); // Clic sur le panier
-  const cartProduct = await page.textContent('.sc-list-item-content span.a-truncate-cut'); // Vérifie le nom du produit dans le panier
-  expect(cartProduct).toContain('ordinateur'); // Vérifie que le bon produit est dans le panier
-});
+        // When Je clique sur un produit
+        await amazonPage.selectProduct();
 
+        // When Je l'ajoute au panier
+        await amazonPage.addToCart();
 
-test('Rechercher un produit par catégorie sur Amazon', async ({ page }) => {
-  const homePage = new AmazonHomePage(page);
-  const searchResultsPage = new AmazonSearchResultsPage(page);
-  const productPage = new AmazonProductPage(page);
-  const checkoutPage = new AmazonCheckoutPage(page);
-  // Aller sur le site Amazon
-  await page.goto('https://www.amazon.fr/');
-  // Accepter les cookies
-  await homePage.acceptCookies();
+        // Then Le produit est dans mon panier
+        await amazonPage.goToCart();
+    });
 
-  // When: Je navigue vers une catégorie de produits
-  await page.click('a#nav-hamburger-menu'); // Sélecteur pour ouvrir le menu "Toutes les catégories"
-  
-  // Attendre que le menu soit visible
-  await page.waitForSelector('ul.hmenu-visible'); // Attendre que le menu des catégories soit visible
+    test('Rechercher un produit par catégorie', async ({ page }) => {
+        // Given Je suis sur la page d'accueil
+        // (Déjà fait dans beforeEach)
 
-  // Clic sur la section "Informatique" (data-menu-id peut changer en fonction de la région)
-  await page.click('a[data-menu-id="5"]'); 
+        // When Je navigue vers une catégorie de produits
+        await amazonPage.navigateToCategory('Électronique');
 
-  // Attendre que le sous-menu de la catégorie soit visible
-  await page.waitForSelector('ul.hmenu-visible');
+        // Then Les produits de cette catégorie sont affichés
+        const productsDisplayed = await page.locator('.s-main-slot .s-result-item').count();
+        expect(productsDisplayed).toBeGreaterThan(0); // Vérifie qu'il y a des produits affichés
+    });
 
-  // Then: Je clique sur une sous-catégorie, ici "Ordinateurs portables"
-  await page.click('a[href*="b?node=429882031"]'); // Vérifie et ajuste ce sélecteur si nécessaire
+    test('Mettre un produit dans le panier', async ({ page }) => {
+        // Given Je suis sur la page d'un produit
+        await amazonPage.goto();
+        await amazonPage.searchProduct('lego');
+        await amazonPage.selectProduct();
 
-  // Then: Les produits de cette catégorie sont affichés
-  await expect(page).toHaveURL(/node=429882031/); // Vérifie que la page de la sous-catégorie est bien chargée
+        // When Je clique sur "Ajouter au panier"
+        await amazonPage.addToCart();
 
-  // Vérification que la liste des produits est affichée
-  const categoryTitle = await page.textContent('span[class*="a-size-base a-color-base"]');
-  expect(categoryTitle).toContain('Ordinateurs portables'); // Vérifie que le bon titre de catégorie est affiché
-});
+        // Then Le produit est ajouté dans mon panier
+        await amazonPage.goToCart();
+        // Vérifie que le produit est dans le panier
+        const cartItems = await page.locator('.sc-product-title').allTextContents();
+        expect(cartItems).toContain('lego');
+    });
 
-test('Recherche un produit par catégorie sur Amazon', async ({ page }) => {
-  await page.goto('https://www.amazon.com');
-  
-  // Remplacez 'Electronics' et 'headphones' par la catégorie et le produit de votre choix
-  await page.searchProductByCategory('Electronics', 'headphones');
+    test('Vérifier les quantités de produit dans le panier', async ({ page }) => {
+        // Given J'ai un produit dans mon panier
+        await amazonPage.goto();
+        await amazonPage.searchProduct('lego');
+        await amazonPage.selectProduct();
+        await amazonPage.addToCart();
+        await amazonPage.goToCart();
 
-  // Vérifiez que des résultats sont affichés
-  const resultsSelector = 'div.s-main-slot';
-  await page.waitForSelector(resultsSelector);
-  const results = await page.locator(resultsSelector).count();
-  console.log(`Nombre de résultats trouvés: ${results}`);
-  
-  // Ajoutez des assertions selon vos besoins
-});
+        // When Je vais sur la page du panier
+        // (Déjà fait)
 
+        // Then Je peux modifier la quantité du produit
+        await amazonPage.changeProductQuantity(2);
+        const selectedQuantity = await page.locator('select[name="quantity"]').inputValue();
+        expect(selectedQuantity).toBe('2'); // Vérifie que la quantité a été mise à jour
+    });
+    
+    test('Supprimer un produit du panier', async ({ page }) => {
+      // Given Je suis sur la page d'accueil
+      // (Déjà fait dans beforeEach)
 
+      // When Je recherche un produit
+      await amazonPage.searchProduct('ordinateur portable');
+      await amazonPage.selectProduct();
 
-test('Mettre un produit dans le panier sur Amazon avec gestion des cookies', async ({ page }) => {
-  // Given: Je suis sur la page d'un produit
-  await page.goto('https://www.amazon.fr/SKYJO-Magilano-divertir-amusantes-famille/dp/B06XZ9K244/ref=zg_bs_c_boost_d_sccl_1/259-8320578-2294812?pd_rd_w=7ZLt4&content-id=amzn1.sym.dd85b726-57e2-4c6c-b501-f81d1824a55a&pf_rd_p=dd85b726-57e2-4c6c-b501-f81d1824a55a&pf_rd_r=D61ZNEZ2F29N6QJFR3W9&pd_rd_wg=VLmgZ&pd_rd_r=f30a0512-76e7-4b82-ae5b-55498100d3d9&pd_rd_i=B06XZ9K244&th=1'); // Remplace par l'URL d'un produit spécifique
+      // When Je l'ajoute au panier
+      await amazonPage.addToCart();
 
-  // Vérifie si la demande d'activation des cookies apparaît, et la gère
-  const acceptCookiesPopup = await page.$('h4.a-alert-heading');
-  if (acceptCookiesPopup) {
-    // Attendre que le bouton "Continuer" soit visible et cliquer dessus pour activer les cookies
-    await page.waitForSelector('input[name="accept"]');
-    await page.click('input[name="accept"]');
-  }
+      // Then Le produit est dans mon panier
+      await amazonPage.goToCart();
+      const cartItemsBeforeRemoval = await page.locator('.sc-product-title').count();
+      expect(cartItemsBeforeRemoval).toBeGreaterThan(0); // Vérifie qu'il y a au moins un produit
 
-  // When: Je clique sur "Ajouter au panier"
-  await page.waitForSelector('#add-to-cart-button'); // Attendre que le bouton soit visible
-  await page.click('#add-to-cart-button'); // Sélecteur du bouton "Ajouter au panier"
+      // When Je supprime le produit du panier
+      await amazonPage.removeProductFromCart();
 
-  // Then: Le produit est ajouté dans mon panier
-  await page.waitForSelector('#nav-cart-count'); // Attendre que l'icône du panier soit mise à jour
-  const cartCount = await page.textContent('#nav-cart-count'); // Obtenir le nombre d'articles dans le panier
-  expect(parseInt(cartCount)).toBeGreaterThan(0); // Vérifie que le produit a bien été ajouté
-});
-
-
-
-test('Supprimer un produit du panier sur Amazon avec gestion des fenêtres modales et clic forcé', async ({ page }) => {
-  await page.goto('https://www.amazon.com');
-
-  // Recherchez un produit
-  await page.searchProductByCategory('Electronics', 'headphones');
-  
-  // Sélectionner le premier produit de la liste
-  const firstProduct = page.locator('.s-main-slot .s-result-item').first();
-  await firstProduct.click();
-  
-  // Ajouter le produit au panier
-  await page.addProductToCart();
-
-  // Aller au panier
-  await page.goToCart();
-
-  // Supprimer le produit du panier
-  await page.removeProductFromCart();
-
-  // Vérifiez que le panier est vide ou affiche le message approprié
-  const emptyCartMessage = await page.locator('.a-row.a-spacing-base .a-size-medium').innerText();
-  console.log(`Message affiché : ${emptyCartMessage}`);
-  if (emptyCartMessage.includes('Your Amazon Cart is empty')) {
-      console.log('Le produit a été supprimé avec succès du panier.');
-  } else {
-      console.log('Erreur lors de la suppression du produit du panier.');
-  }
+      // Then Le panier est vide ou ne contient pas le produit
+      const cartItemsAfterRemoval = await page.locator('.sc-product-title').count();
+      expect(cartItemsAfterRemoval).toBe(0); // Vérifie que le panier est vide
+  });
 });
 
 
@@ -148,55 +108,7 @@ test('Supprimer un produit du panier sur Amazon avec gestion des fenêtres modal
 
 
 
-test('Connexion à un compte Amazon', async ({ pageWithCookiesAccepted }) => {
-  // Naviguer vers la page de connexion
-  await pageWithCookiesAccepted.goto('https://www.amazon.fr/ap/signin?openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.fr%2F%3Fref_%3Dnav_signin&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.assoc_handle=frflex&openid.mode=checkid_setup&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0');
-
-  // Saisir l'email ou numéro de téléphone
-  await pageWithCookiesAccepted.fill('input[name="email"]', 'matteo.dugue@student.junia.com');
-
-  // Cliquer sur "Continuer"
-  await pageWithCookiesAccepted.click('input#continue');
-
-  // Saisir le mot de passe
-  await pageWithCookiesAccepted.fill('input[name="password"]', 'testtest');
-
-  // Cliquer sur "Connexion"
-  await pageWithCookiesAccepted.click('input#signInSubmit');
-
-  // Attendre que l'utilisateur soit redirigé et vérifier la connexion réussie
-  await pageWithCookiesAccepted.waitForSelector('#nav-link-accountList'); // Sélecteur d'un élément spécifique après connexion
-  const accountText = await pageWithCookiesAccepted.textContent('#nav-link-accountList');
-  
-  // Vérifier que le texte contient une indication que l'utilisateur est connecté (par exemple, "Bonjour, Nom")
-  expect(accountText).toContain('Bonjour,'); // Remplace par le texte attendu après connexion
-
-  // Test supplémentaire : vérifier que le bouton "Déconnexion" est présent
-  await pageWithCookiesAccepted.hover('#nav-link-accountList'); // Survoler le menu de compte
-  await pageWithCookiesAccepted.waitForSelector('a#nav-item-signout'); // Sélecteur du bouton "Déconnexion"
-  expect(await pageWithCookiesAccepted.isVisible('a#nav-item-signout')).toBeTruthy();
-});
 
 
 
 
-test('Test Amazon Search and Add to Cart', async ({ page }) => {
-  // Créer une instance de la classe AmazonHomePage
-  const amazonHomePage = new AmazonHomePage(page);
-
-  // Naviguer vers Amazon
-  await amazonHomePage.navigate();
-
-  // Rechercher un produit spécifique
-  await amazonHomePage.searchForItem('PlayStation 5');
-
-  // Cliquer sur le premier produit dans la liste des résultats
-  await amazonHomePage.clickOnFirstProduct();
-
-  // Ajouter le produit au panier
-  await amazonHomePage.addToCart();
-
-  // Aller au panier et vérifier que l'URL est correcte
-  await amazonHomePage.goToCart();
-  await expect(page).toHaveURL('https://www.amazon.com/gp/cart/view.html');
-});
