@@ -68,7 +68,7 @@ test('Ajouter un produit au panier et vérifier que le panier est vide', async (
 
 test('Filtrer les PC portables sur Amazon avec des critères spécifiques', async ({ page }) => {
     const homePage = new AmazonHomePage(page);
-    const searchResultsPage = new AmazonSearchResultsPage(page());
+    const searchResultsPage = new AmazonSearchResultsPage(page);
     const categoryPage = new AmazonCategoryPage(page); // Utiliser la page de catégorie pour appliquer les filtres
 
     // Aller sur le site Amazon
