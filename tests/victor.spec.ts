@@ -89,3 +89,21 @@ test('Vérifier les filtres et catégories sur une page de catégorie', async ({
     expect(filteredResults.length).toBeGreaterThan(0); // Check that there are results
 });
 
+test('acheter les produits fréquemment achetés ensemble', async ({ page }) => {
+    const homePage = new AmazonHomePage(page);
+    const searchResultsPage = new AmazonSearchResultsPage(page);
+    
+    
+    await page.goto('https://www.amazon.fr');
+    await homePage.acceptCookies();
+    await homePage.searchForProduct('clavier');
+    await searchResultsPage.selectFirstProduct();
+    await page.locator('#similarities-product-bundle-widget-title').scrollIntoViewIfNeeded();
+    await page.click('input[name="submit.addToCart"]');
+    
+
+
+
+
+
+});
