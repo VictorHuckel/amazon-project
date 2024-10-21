@@ -104,6 +104,8 @@ test('acheter les produits fréquemment achetés ensemble', async ({ page }) => 
     await searchResultsPage.selectFirstProduct();
     await page.locator('#similarities-product-bundle-widget-title').scrollIntoViewIfNeeded();
     await page.click('input[name="submit.addToCart"]');
+    await page.click('input[name="proceedToRetailCheckout"]');
+    
     
 
 
