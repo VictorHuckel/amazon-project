@@ -85,7 +85,7 @@ test('Filtrer les PC portables sur Amazon avec des critères spécifiques', asyn
     await page.waitForTimeout(5000); // Ajustez le temps d'attente selon le besoin
 
     // Appliquer les filtres spécifiques :
-    await categoryPage.applyFilterByLabel('Marque', 'Lenovo');  // Filtrer par Marque: Lenovo
+    await categoryPage.applyFilterByLabel('Marques', 'Lenovo');  // Filtrer par Marque: Lenovo
     await page.waitForLoadState('networkidle'); // Attendre que les résultats se mettent à jour
 });
 
