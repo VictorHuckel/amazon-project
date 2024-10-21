@@ -84,8 +84,7 @@ test('Filtrer les PC portables sur Amazon avec des critères spécifiques', asyn
     await searchResultsPage.waitForResults();
     await page.waitForTimeout(5000); // Ajustez le temps d'attente selon le besoin
 
-    // await categoryPage.Filtres('64 Go');
-    // Filtrer par prix en utilisant l'ID de la barre de filtre
+    await categoryPage.Filtres('64 Go');
     
     
 
@@ -103,11 +102,6 @@ test('acheter les produits fréquemment achetés ensemble', async ({ page }) => 
     await page.locator('#similarities-product-bundle-widget-title').scrollIntoViewIfNeeded();
     await page.click('input[name="submit.addToCart"]');
     await page.click('input[name="proceedToRetailCheckout"]');
-    
-    
-
-
-
-
 
 });
+
