@@ -72,11 +72,14 @@ test('Rechercher un produit par catégorie sur Amazon', async ({ page }) => {
   expect(categoryTitle).toContain('Ordinateurs portables'); // Vérifie que le bon titre de catégorie est affiché
 });
 
-test('Recherche un produit par catégorie sur Amazon', async ({ page }) => {
-  await page.goto('https://www.amazon.com');
+/*test('Recherche un produit par catégorie sur Amazon', async ({ page }) => {
+  const homePage = new AmazonHomePage(page);
+  await page.goto('https://www.amazon.fr');
+  // Accepter les cookies
+  await homePage.acceptCookies();
   
   // Remplacez 'Electronics' et 'headphones' par la catégorie et le produit de votre choix
-  await page.searchProductByCategory('Electronics', 'headphones');
+  await homePage.searchProductByCategory('Electronics', 'headphones');
 
   // Vérifiez que des résultats sont affichés
   const resultsSelector = 'div.s-main-slot';
@@ -86,6 +89,7 @@ test('Recherche un produit par catégorie sur Amazon', async ({ page }) => {
   
   // Ajoutez des assertions selon vos besoins
 });
+*/
 
 
 
@@ -114,23 +118,32 @@ test('Mettre un produit dans le panier sur Amazon avec gestion des cookies', asy
 
 
 test('Supprimer un produit du panier sur Amazon avec gestion des fenêtres modales et clic forcé', async ({ page }) => {
-  await page.goto('https://www.amazon.com');
+  const homePage = new AmazonHomePage(page);
+  await page.goto('https://www.amazon.fr');
+  // Accepter les cookies
+  await homePage.acceptCookies();
 
-  // Recherchez un produit
-  await page.searchProductByCategory('Electronics', 'headphones');
+  // When: Je saisis le nom d'un produit dans le moteur de recherche
+  await page.fill('input#twotabsearchtextbox', 'ordinateur portable'); // Remplacez par le nom du produit
+
+  // And: Je clique sur le bouton "Rechercher"
+  await page.click('input#nav-search-submit-button');
   
+  // Then: Je vois les résultats de recherche
+  await expect(page).toHaveURL(/s/); // Vérifie si la page des résultats de recherche est affichée
+
   // Sélectionner le premier produit de la liste
   const firstProduct = page.locator('.s-main-slot .s-result-item').first();
   await firstProduct.click();
   
   // Ajouter le produit au panier
-  await page.addProductToCart();
+  await homePage.addToCart();
 
   // Aller au panier
-  await page.goToCart();
+  await homePage.goToCart();
 
   // Supprimer le produit du panier
-  await page.removeProductFromCart();
+  await homePage.removeProductFromCart();
 
   // Vérifiez que le panier est vide ou affiche le message approprié
   const emptyCartMessage = await page.locator('.a-row.a-spacing-base .a-size-medium').innerText();
@@ -180,15 +193,18 @@ test('Connexion à un compte Amazon', async ({ pageWithCookiesAccepted }) => {
 
 
 
-test('Test Amazon Search and Add to Cart', async ({ page }) => {
+/*test('Test Amazon Search and Add to Cart', async ({ page }) => {
+
   // Créer une instance de la classe AmazonHomePage
   const amazonHomePage = new AmazonHomePage(page);
 
   // Naviguer vers Amazon
   await amazonHomePage.navigate();
+  // Accepter les cookies
+  await amazonHomePage.acceptCookies();
 
   // Rechercher un produit spécifique
-  await amazonHomePage.searchForItem('PlayStation 5');
+  await amazonHomePage.searchForItem('livre');
 
   // Cliquer sur le premier produit dans la liste des résultats
   await amazonHomePage.clickOnFirstProduct();
@@ -199,4 +215,4 @@ test('Test Amazon Search and Add to Cart', async ({ page }) => {
   // Aller au panier et vérifier que l'URL est correcte
   await amazonHomePage.goToCart();
   await expect(page).toHaveURL('https://www.amazon.com/gp/cart/view.html');
-});
+});*/

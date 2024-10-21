@@ -38,7 +38,7 @@ class AmazonHomePage {
 
     // Méthode pour naviguer vers la page d'accueil d'Amazon
     async navigate() {
-        await this.page.goto('https://www.amazon.com');
+        await this.page.goto('https://www.amazon.fr');
     }
 
     async searchProductByCategory(category, product) {
@@ -48,9 +48,9 @@ class AmazonHomePage {
     }
     async addToCart() {
         // Attendre que la page soit chargée et que le bouton soit visible
-        await this.page.waitForLoadState('domcontentloaded');
+        //await this.page.waitForLoadState('domcontentloaded');
         // Sélectionner un sélecteur alternatif si nécessaire
-        await this.page.waitForSelector('#add-to-cart-button', { state: 'visible', timeout: 10000 });
+        await this.page.waitForSelector('#add-to-cart-button');
         // S'assurer que l'élément est visible à l'écran
         await this.addToCartButton.scrollIntoViewIfNeeded(); 
         // Cliquer sur le bouton ajouter au panier
