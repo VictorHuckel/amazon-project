@@ -1,5 +1,5 @@
 // pages/AmazonProductPage.ts
-import { Page } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 
 class AmazonProductPage {
     private page: Page;

@@ -1,5 +1,5 @@
 // pages/AmazonPanier.ts
-import { Page } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 
 class AmazonPanier {
     private page: Page;

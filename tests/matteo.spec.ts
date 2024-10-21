@@ -76,7 +76,7 @@ test('Recherche un produit par catégorie sur Amazon', async ({ page }) => {
   await page.goto('https://www.amazon.com');
   
   // Remplacez 'Electronics' et 'headphones' par la catégorie et le produit de votre choix
-  await homepage.searchProductByCategory('Electronics', 'headphones');
+  await page.searchProductByCategory('Electronics', 'headphones');
 
   // Vérifiez que des résultats sont affichés
   const resultsSelector = 'div.s-main-slot';
@@ -113,27 +113,27 @@ test('Mettre un produit dans le panier sur Amazon avec gestion des cookies', asy
 
 
 
-test('Supprimer un produit du panier sur Amazon avec gestion des fenêtres modales et clic forcé', async ({ amazonPage }) => {
-  await amazonPage.page.goto('https://www.amazon.com');
+test('Supprimer un produit du panier sur Amazon avec gestion des fenêtres modales et clic forcé', async ({ page }) => {
+  await page.goto('https://www.amazon.com');
 
   // Recherchez un produit
-  await amazonPage.searchProductByCategory('Electronics', 'headphones');
+  await page.searchProductByCategory('Electronics', 'headphones');
   
   // Sélectionner le premier produit de la liste
-  const firstProduct = amazonPage.page.locator('.s-main-slot .s-result-item').first();
+  const firstProduct = page.locator('.s-main-slot .s-result-item').first();
   await firstProduct.click();
   
   // Ajouter le produit au panier
-  await amazonPage.addProductToCart();
+  await page.addProductToCart();
 
   // Aller au panier
-  await amazonPage.goToCart();
+  await page.goToCart();
 
   // Supprimer le produit du panier
-  await amazonPage.removeProductFromCart();
+  await page.removeProductFromCart();
 
   // Vérifiez que le panier est vide ou affiche le message approprié
-  const emptyCartMessage = await amazonPage.page.locator('.a-row.a-spacing-base .a-size-medium').innerText();
+  const emptyCartMessage = await page.locator('.a-row.a-spacing-base .a-size-medium').innerText();
   console.log(`Message affiché : ${emptyCartMessage}`);
   if (emptyCartMessage.includes('Your Amazon Cart is empty')) {
       console.log('Le produit a été supprimé avec succès du panier.');

@@ -1,4 +1,4 @@
-import { Page } from 'playwright';
+import { Page, Locator } from 'playwright';
 
 class AmazonSearchResultsPage {
     private page: Page;
