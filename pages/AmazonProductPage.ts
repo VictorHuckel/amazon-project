@@ -17,6 +17,7 @@ class AmazonProductPage {
     async addToCart() {
         await this.page.click(this.addToCartButton);
     }
+    
 }
 
 export default AmazonProductPage;

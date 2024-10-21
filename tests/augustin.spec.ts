@@ -74,10 +74,7 @@ test('Service client', async ({ page }) => {
   await page.waitForSelector('.hmenu-visible');
 
   await serviceClientOption.click();
-
   await expect(page).toHaveURL(/.*help\/customer\/display.html/);
-
-
 });
 
 test('Changer la langue du site', async ({ page }) => {
