@@ -34,7 +34,7 @@ test('Passer une commande avec un login pendant le checkout', async ({ page }) =
 });
 
 
-test('Ajouter un produit au panier et vérifier que le panier est vide', async ({ page }) => {
+test('Ajouter un produit au panierle supprimer et vérifier que le panier est vide', async ({ page }) => {
     const homePage = new AmazonHomePage(page);
     const searchResultsPage = new AmazonSearchResultsPage(page);
     const productPage = new AmazonProductPage(page);
@@ -47,7 +47,7 @@ test('Ajouter un produit au panier et vérifier que le panier est vide', async (
     await homePage.acceptCookies();
 
     // Ajouter un produit au panier (rechercher un produit et l'ajouter)
-    await homePage.searchForProduct('produit de test');
+    await homePage.searchForProduct('iphone 16');
     await searchResultsPage.selectFirstProduct();
     await productPage.addToCart(); // On suppose que vous avez une méthode pour ajouter au panier
 
