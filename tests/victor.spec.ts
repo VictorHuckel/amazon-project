@@ -68,29 +68,25 @@ test('Ajouter un produit au panier et vérifier que le panier est vide', async (
 
 test('Filtrer les PC portables sur Amazon avec des critères spécifiques', async ({ page }) => {
     const homePage = new AmazonHomePage(page);
-    const searchResultsPage = new AmazonSearchResultsPage(page);
-    const productPage = new AmazonProductPage(page);
-    const panier = new AmazonPanier(page);
+    const searchResultsPage = new AmazonSearchResultsPage(page());
     const categoryPage = new AmazonCategoryPage(page); // Utiliser la page de catégorie pour appliquer les filtres
 
-    // Go to the Amazon site
+    // Aller sur le site Amazon
     await page.goto('https://www.amazon.fr/');
 
-    // Accept cookies
+    // Accepter les cookies
     await homePage.acceptCookies();
 
-    // Navigate to a category page (adjust URL for a real category)
-    await page.goto('https://www.amazon.fr/s?field-keywords=electronics'); // Example URL
+    // Rechercher "PC portable"
+    await homePage.searchForProduct('PC portable');
 
-    // Use a filter
-    const filterValue = 'Filtre Exemples'; // Replace with a valid filter
-    // await categoryPage.useFilter(filterValue);
+    // Attendre que les résultats de recherche apparaissent
+    await searchResultsPage.waitForResults();
+    await page.waitForTimeout(5000); // Ajustez le temps d'attente selon le besoin
 
-    // Get filtered results
-    const filteredResults = await categoryPage.getFilteredResults();
-
-    // Verify that the results are updated
-    expect(filteredResults.length).toBeGreaterThan(0); // Check that there are results
+    // Appliquer les filtres spécifiques :
+    await categoryPage.applyFilterByLabel('Marque', 'Lenovo');  // Filtrer par Marque: Lenovo
+    await page.waitForLoadState('networkidle'); // Attendre que les résultats se mettent à jour
 });
 
 test('acheter les produits fréquemment achetés ensemble', async ({ page }) => {
