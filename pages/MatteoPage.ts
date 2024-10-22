@@ -7,12 +7,27 @@ export class AmazonPage {
 
     async goto() {
         await this.page.goto('https://www.amazon.fr');
-        
-        // Attendre et accepter les cookies si le bandeau apparaît
+
+        // Attendre que le bouton d'acceptation des cookies soit présent
         const acceptCookiesButton = this.page.locator('button[data-a-button-type="accept"]');
-        if (await acceptCookiesButton.isVisible()) {
-            await acceptCookiesButton.click();
+        
+        try {
+            // Attendre que le bouton d'acceptation des cookies soit visible (maximum 5 secondes)
+            await acceptCookiesButton.waitFor({ state: 'visible', timeout: 5000 });
+
+            // Faire défiler la page pour s'assurer que le bouton est dans le champ de vision
+            await acceptCookiesButton.scrollIntoViewIfNeeded();
+
+
+            // Vérifier si le bouton est visible avant de cliquer
+            if (await acceptCookiesButton.isVisible()) {
+                await acceptCookiesButton.click({ force: true });
+            }
+        } catch (error) {
+            console.log("Le bouton d'acceptation des cookies n'est pas visible ou a déjà été accepté.");
+
         }
+
     }
 
     async searchProduct(productName: string) {
@@ -30,24 +45,35 @@ export class AmazonPage {
 
     async goToCart() {
         await this.page.click('#nav-cart');
+        // Attendre que la page du panier se charge
+        await this.page.waitForTimeout(2000); // Ajuster le délai si nécessaire
     }
 
     async removeProductFromCart() {
-        // Attendre que le bouton pour supprimer le produit soit visible
-        const deleteButton = this.page.locator('input[name="submit.delete"], .sc-action-delete'); // Vérifier le sélecteur
-        await deleteButton.waitFor({ state: 'visible' }); // Attendre que le bouton soit visible
+        // Attendre que les produits du panier soient visibles
+        const cartItem = this.page.locator('.sc-product-title');
+        await cartItem.waitFor({ state: 'visible', timeout: 5000 });
         
-        // Cliquez sur le bouton de suppression, en utilisant un clic forcé si nécessaire
-        await deleteButton.click({ force: true });
+        // Cliquer sur le bouton de suppression
+        const deleteButton = this.page.locator('.sc-action-delete');
+        await deleteButton.waitFor({ state: 'visible', timeout: 5000 });
         
-        // Attendre que la modal de confirmation apparaisse (ajuste le sélecteur si nécessaire)
-        const confirmButton = this.page.locator('.a-popover-footer .a-button-input'); // Vérifier le sélecteur pour le bouton de confirmation
-        await confirmButton.waitFor({ state: 'visible' });
-        
-        // Cliquer sur le bouton de confirmation
-        await confirmButton.click();
-    }
+        // Si le bouton est visible, le cliquer
+        if (await deleteButton.isVisible()) {
+            await deleteButton.click({ force: true });
+        }
 
+        // Vérifier si une modal de confirmation apparaît
+        const confirmButton = this.page.locator('.a-button-input[name="submit.delete"]');
+        await confirmButton.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {
+            console.log("Aucune modal de confirmation trouvée.");
+        });
+
+        // Si la modal est visible, cliquer sur le bouton de confirmation
+        if (await confirmButton.isVisible()) {
+            await confirmButton.click();
+        }
+    }
     async navigateToCategory(category: string) {
         await this.page.click(`text=${category}`); // Clique sur la catégorie
     }
@@ -55,4 +81,52 @@ export class AmazonPage {
     async changeProductQuantity(quantity: number) {
         await this.page.selectOption('select[name="quantity"]', String(quantity));
     }
+
+    async removeAllProductsFromCart() {
+        await this.goToCart();
+        
+        // Sélecteur pour les éléments du panier
+        const cartItems = this.page.locator('.sc-product-title');
+
+        // Vérifier s'il y a des produits dans le panier
+        const count = await cartItems.count();
+        if (count === 0) {
+            console.log("Le panier est déjà vide.");
+            return;
+        }
+
+        // Boucle pour supprimer tous les produits du panier
+        for (let i = 0; i < count; i++) {
+            // Attendre que l'élément soit visible
+            await cartItems.nth(i).waitFor({ state: 'visible', timeout: 5000 });
+
+            // Trouver le bouton de suppression
+            const deleteButton = this.page.locator('.sc-action-delete').nth(i);
+            await deleteButton.waitFor({ state: 'visible', timeout: 5000 });
+            
+            // Cliquer sur le bouton de suppression
+            if (await deleteButton.isVisible()) {
+                await deleteButton.click({ force: true });
+                console.log(`Produit ${i + 1} supprimé du panier.`);
+            }
+
+            // Attendre que la modal de confirmation soit visible (si elle apparaît)
+            const confirmButton = this.page.locator('.a-button-input[name="submit.delete"]');
+            await confirmButton.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {
+                console.log("Aucune modal de confirmation trouvée pour le produit.");
+            });
+
+            // Cliquer sur le bouton de confirmation si visible
+            if (await confirmButton.isVisible()) {
+                await confirmButton.click();
+                console.log(`Confirmation de la suppression du produit ${i + 1}.`);
+            }
+
+            // Attendre que le panier se mette à jour
+            await this.page.waitForTimeout(2000); // Ajuster le délai si nécessaire
+        }
+
+        console.log("Tous les produits ont été supprimés du panier.");
+    }
 }
+
