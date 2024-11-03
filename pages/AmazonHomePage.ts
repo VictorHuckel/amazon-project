@@ -2,6 +2,13 @@
 import { Page, Locator, expect } from '@playwright/test';
 
 class AmazonHomePage {
+    goto() {
+        throw new Error('Method not implemented.');
+    }
+    navigateToCategory // Sélecteur basé sur un texte (si le texte est en clair dans le bouton)
+        (arg0: string) {
+            throw new Error('Method not implemented.');
+    }
     private page: Page;
     private cookieAcceptButton = '#sp-cc-accept';
     //private searchInput = 'input[name="field-keywords"]';

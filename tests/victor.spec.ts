@@ -25,9 +25,9 @@ test('Passer une commande avec un login pendant le checkout', async ({ page }) =
     await productPage.clickBuyNow(); // Utiliser la méthode pour cliquer sur "Acheter"
 
     // Se connecter pendant le processus de checkout
-    await signInPage.enterEmail('augustinf59@gmail.com');
+    await signInPage.enterEmail('augustinf59@gmail.com', { timeout: 5000 });
     await signInPage.clickContinue();
-    await signInPage.enterPassword('Bertille1;');
+    await signInPage.enterPassword('Bertille1;', { timeout: 5000 });
     await signInPage.clickSignIn();
 
 
