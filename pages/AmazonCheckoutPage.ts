@@ -2,6 +2,9 @@
 import { Page, Locator, expect } from '@playwright/test';
 
 class AmazonCheckoutPage {
+    verifyCheckoutPage() {
+        throw new Error('Method not implemented.');
+    }
     private page: Page;
     private emailInput = 'input[name="email"]';
     private continueButton = 'text=Continuer';

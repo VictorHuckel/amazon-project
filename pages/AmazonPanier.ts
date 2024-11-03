@@ -2,6 +2,20 @@
 import { Page, Locator, expect } from '@playwright/test';
 
 class AmazonPanier {
+    removeAllProductsFromCart() {
+        throw new Error('Method not implemented.');
+    }
+    async changeProductQuantity(quantity: number) {
+        await this.page.selectOption('select[name="quantity"]', quantity.toString());
+    }
+
+    getSelectedQuantity() {
+        throw new Error('Method not implemented.');
+    }
+    
+    getCartItems() {
+        throw new Error('Method not implemented.');
+    }
     private page: Page;
     private cartIcon = '.nav-cart-icon'; // Sélecteur pour l'icône du panier
     private removeButton = '.sc-action-delete'; // Sélecteur pour le bouton de suppression du produit

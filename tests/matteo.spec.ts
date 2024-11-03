@@ -2,6 +2,7 @@
 
 import { test, expect } from '@playwright/test';
 import { AmazonPage } from '../pages/MatteoPage';
+import  AmazonHomePage from '../pages/AmazonHomePage';
 
 test.describe('Tests Amazon', () => {
     let amazonPage: AmazonPage;
@@ -10,12 +11,14 @@ test.describe('Tests Amazon', () => {
         // Initialiser la page Amazon
       amazonPage = new AmazonPage(page);
       await amazonPage.goto();
+      
+
     });
 
     test('Rechercher un produit dans le moteur de recherche puis l’acheter', async ({ page }) => {
         // Given Je suis sur la page d'accueil
         // (Déjà fait dans beforeEach)
-
+      await amazonPage.acceptCookies();
         // When Je saisis le nom d'un produit dans le moteur de recherche
       await amazonPage.searchProduct('lego');
 

@@ -3,6 +3,9 @@
 import { Page } from '@playwright/test';
 
 export class AmazonPage {
+    acceptCookies() {
+        throw new Error('Method not implemented.');
+    }
     constructor(private page: Page) {}
 
     async goto() {
