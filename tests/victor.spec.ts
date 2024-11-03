@@ -25,16 +25,16 @@ test('Passer une commande avec un login pendant le checkout', async ({ page }) =
     await productPage.clickBuyNow(); // Utiliser la méthode pour cliquer sur "Acheter"
 
     // Se connecter pendant le processus de checkout
-    await signInPage.enterEmail('augustinf59@gmail.com', { timeout: 5000 });
+    await signInPage.enterEmail('augustinf59@gmail.com');
     await signInPage.clickContinue();
-    await signInPage.enterPassword('Bertille1;', { timeout: 5000 });
+    await signInPage.enterPassword('Bertille1;');
     await signInPage.clickSignIn();
 
 
 });
 
 
-test('Ajouter un produit au panierle supprimer et vérifier que le panier est vide', async ({ page }) => {
+test('Ajouter un produit au panier et le supprimer', async ({ page }) => {
     const homePage = new AmazonHomePage(page);
     const searchResultsPage = new AmazonSearchResultsPage(page);
     const productPage = new AmazonProductPage(page);

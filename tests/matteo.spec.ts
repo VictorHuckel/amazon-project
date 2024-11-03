@@ -17,6 +17,7 @@ test.describe('Tests Amazon', () => {
 
     test('Rechercher un produit dans le moteur de recherche puis l’acheter', async ({ page }) => {
         // Given Je suis sur la page d'accueil
+        const amazonPage = new AmazonPage(page);
         // (Déjà fait dans beforeEach)
       await amazonPage.acceptCookies();
         // When Je saisis le nom d'un produit dans le moteur de recherche

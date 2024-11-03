@@ -11,7 +11,7 @@ export class AmazonSignInPage {
         await this.page.goto('https://www.amazon.com/ap/signin');
     }
 
-    async enterEmail(email: string, p0: { timeout: number; }) {
+    async enterEmail(email: string) {
         await this.page.fill('#ap_email', email);
     }
 
@@ -19,7 +19,7 @@ export class AmazonSignInPage {
         await this.page.click('#continue');
     }
 
-    async enterPassword(password: string, p0: { timeout: number; }) {
+    async enterPassword(password: string) {
         await this.page.fill('#ap_password', password);
     }
 
@@ -28,9 +28,9 @@ export class AmazonSignInPage {
     }
 
     async signIn(email: string, password: string) {
-        await this.enterEmail(email, { timeout: 5000 });
+        await this.enterEmail(email);
         await this.clickContinue();
-        await this.enterPassword(password, { timeout: 5000 });
+        await this.enterPassword(password);
         await this.clickSignIn();
     }
 }

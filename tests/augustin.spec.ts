@@ -57,10 +57,6 @@ test('Mettre à jour les adresses de livraison', async ({ page }) => {
   await page.goto('https://www.amazon.fr/');
   await homePage.acceptCookies();
   await homePage.Changeadress('59310');
-
-
-
-
 });
 
 test('Service client', async ({ page }) => {
