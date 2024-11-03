@@ -46,7 +46,7 @@ test.describe('Tests Amazon', () => {
         await productPage.addToCart();
 
         await panier.goToCart();
-        await page.locator('input[value="Mettre de côté"]').click();
+        await page.locator('input[value="Mettre de côté"]').nth(0).click({ force: true });
 
 
         
