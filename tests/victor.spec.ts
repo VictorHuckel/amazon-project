@@ -91,7 +91,9 @@ test('Filtrer les PC portables sur Amazon avec des critères spécifiques', asyn
 
 });
 
-test('acheter les produits fréquemment achetés ensemble', async ({ page }) => {
+test('acheter les produits fréquemment achetés ensemble',{
+    tag: ['@amazon'], 
+}, async ({ page }) => {
     const homePage = new AmazonHomePage(page);
     const searchResultsPage = new AmazonSearchResultsPage(page);
     
