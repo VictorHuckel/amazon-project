@@ -87,6 +87,7 @@ test('Filtrer les PC portables sur Amazon avec des critères spécifiques', asyn
     await categoryPage.Filtres('64 Go');
     
     
+    
 
 });
 
